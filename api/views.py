@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from django.contrib.auth.models import User
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from .serializers import (
     TaskSerializer,
     LogSerializer,
@@ -26,20 +26,48 @@ class LogViewSet(viewsets.ModelViewSet):
     queryset = Log.objects.all()
     serializer_class = LogSerializer
 
-    def create(self, request, *args, **kwargs):
-        pass
-        
-        # return super().create(request, *args, **kwargs)
-
 
 class TaskViewSet(viewsets.ModelViewSet):
+    filter_backends = (filters.SearchFilter,)
+    filter_fields = (
+        'task_name',
+        'task_description',
+        'task_status',
+        'task_user'
+    )
+    search_fields = (
+        'task_name',
+        'task_description',
+    )
+
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+
+
+    def get_queryset(self):
+        queryset = Task.objects.all()
+        return queryset;
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        serializer = TaskSerializer(queryset, many=True)
+
+        fTask_name = request.query_params.get('task_name', None)
+
+        tasks = Task.objects.filter(task_name__icontains = fTask_name)
+
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
 
     def create(self, request, *args, **kwargs):
         
         # TODO: on authenticated user 
-        user = User.objects.filter(id=request.user.id)
+        user = None
+        if request.user.id:
+            user = User.objects.filter(id=request.user.id)  
 
         new_task = Task.objects.create(
             task_name = request.data['task_name'],
@@ -65,46 +93,26 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         # return Response(serializer.data)
         return tasks
-    
-    
-    def chack_field(self, field_name, prev_data, new_data):
 
-        print("Dzialamy")
+
+    # def update(self, request, *args, **kwargs):
+
+    #     # # TODO: on authenticated user 
+    #     # update_task = self.get_object()
+
+    #     # # TODO: dodanie obiektu log i jego uzupełnienie
         
-        if prev_data != new_data:
-            new_log = Log.objects.create(
-                task_field_name = field_name,
-                prev_value = prev_data,
-                new_value = new_data
-            )
-
-            serializer = LogSerializer(new_log, many=False)
-
-
-    def update(self, request, *args, **kwargs):
+    #     # update_task.task_name = request.data['task_name']
+    #     # update_task.task_description = request.data['task_description']
+    #     # update_task.task_status = request.data['task_status']
         
-        # TODO: on authenticated user 
-        update_task = self.get_object()
+    #     # # TODO: task user 
+    #     # #update_task.task_user = request.data['task_user']
 
-        # TODO: dodanie obiektu log i jego uzupełnienie
+    #     # update_task.save()
 
-        self.chack_field(
-            'task_name',
-            update_task.task_name,
-            request.data['task_name']
-        )
-
-        update_task.task_name = request.data['task_name']
-        update_task.task_description = request.data['task_description']
-        update_task.task_status = request.data['task_status']
-        
-        # TODO: task user 
-        #update_task.task_user = request.data['task_user']
-
-        update_task.save()
-
-        serializer = TaskSerializer(update_task, many=False)
-        return Response(serializer.data)
+    #     # serializer = TaskSerializer(update_task, many=False)
+    #     # return Response(serializer.data)
     
 
     def destroy(self, request, *args, **kwargs):
