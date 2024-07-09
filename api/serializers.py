@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import (
     Task,
@@ -6,6 +6,7 @@ from .models import (
 )
 
 # some serializers
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -25,6 +26,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             }
         }
 
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+
+        # add user group 
+        group = Group.objects.get(name='api_users')
+        user.groups.add(group)
+        return user
 
 
 class TaskSerializer(serializers.ModelSerializer):
