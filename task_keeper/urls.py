@@ -19,9 +19,18 @@ from django.urls import include, path
 
 from rest_framework.authtoken import views
 from api import urls
+from task_keeper import views as task_view
+from rest_framework import routers
+
+
+router = routers.DefaultRouter()
+router.register(r'users', viewset=task_view.UserViewSet)
+router.register(r'groups', viewset=task_view.GroupViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', views.obtain_auth_token),
+    path('', include(router.urls)),
     path('api/', include(urls))
 ]

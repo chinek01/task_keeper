@@ -6,7 +6,7 @@ from api import views
 router = routers.DefaultRouter()
 router.register(r'task', viewset=views.TaskViewSet)
 router.register(r'log', viewset=views.LogViewSet)
-router.register(r'user', viewset=views.UserViewSet)
+# router.register(r'user', viewset=views.UserViewSet)
 
 
 urlpatterns = [
