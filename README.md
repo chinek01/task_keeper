@@ -22,12 +22,22 @@ class Task(models.Model):
         (2, "Rozwiązany")
     ]
 
-    task_name = models.CharField(max_length=124, blank=False, null=False)
-    task_description = models.TextField(default='', blank=None, null=None)
-    task_status = models.PositiveSmallIntegerField(choices=STATUS, default=0)
-    task_user = models.ForeignKey(User, 
-                                  on_delete=models.CASCADE, 
-                                  blank=True, null=True)
+    task_name = models.CharField(
+        max_length=124, 
+        blank=False, 
+        null=False)
+    task_description = models.TextField(
+        default='', 
+        blank=None, 
+        null=None)
+    task_status = models.PositiveSmallIntegerField(
+        choices=STATUS, 
+        default=0)
+    task_user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        blank=True, 
+        null=True)
 
     def __str__(self):
         return "{}".format(self.task_name)
@@ -39,12 +49,25 @@ class Task(models.Model):
 ``` py 
 
 class Log(models.Model):
-    task_field_name = models.CharField(max_length=32, null=False, blank=False)
-    prev_value = models.TextField(default='', null=True, blank=True)
-    new_value = models.TextField(default='', null=True, blank=True)
+    task_field_name = models.CharField(
+        max_length=32, 
+        null=False, 
+        blank=False)
+    prev_value = models.TextField(
+        default='', 
+        null=True, 
+        blank=True)
+    new_value = models.TextField(
+        default='', 
+        null=True, 
+        blank=True)
     change_time = models.DateTimeField(auto_now_add=True)
-    task_id = models.ForeignKey(Task, on_delete=models.CASCADE,
-                                blank=False, null=False)
+    task_id = models.ForeignKey(
+        Task, 
+        on_delete=models.CASCADE,
+        blank=False, 
+        null=False,
+        related_name='logs')
     
     def __str__(self) -> str:
         return "{} -> {}".format(self.task_id, self.task_field_name)
@@ -371,7 +394,7 @@ Przykład odpowiedzi z serwera:
 Zapytanie: 
 
 ```bash
-curl -X GET http://127.0.0.1:8000/api/task?fTask_id=&fTask_name=&fTask_desctiption=curl&fTask_staus=&fTask_user= -H 'Authorization: Token 783770134349cea8888eeb1542122ffdd255bccc'
+curl -X GET http://127.0.0.1:8000/api/task?task_id=&task_name=&task_desctiption=curl&task_staus=&task_user= -H 'Authorization: Token 783770134349cea8888eeb1542122ffdd255bccc'
 ```
 
 Przykład odpowiedzi z serwera:
@@ -395,7 +418,7 @@ Przykład odpowiedzi z serwera:
 Zapytanie: 
 
 ```bash 
-curl -X GET http://127.0.0.1:8000/api/log?fTask_id=8 -H 'Authorization: Token 783770134349cea8888eeb1542122ffdd255bccc'  
+curl -X GET http://127.0.0.1:8000/api/log?task_id=8 -H 'Authorization: Token 783770134349cea8888eeb1542122ffdd255bccc'  
 ```
 
 Przykład odpowiedzi z serwera:

@@ -11,8 +11,6 @@ from .models import (
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        # fields = ['url', 'id', 'username', 'email', 'groups']
-        # rozszerzone o zakładanie nowego usera
         fields = [
             'id',
             'username',
@@ -27,6 +25,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         }
 
     def create(self, validated_data):
+        """
+        overwritten user creation function, automatically add user group
+        """
         user = User.objects.create_user(**validated_data)
 
         # add user group 
@@ -45,7 +46,9 @@ class TaskSerializer(serializers.ModelSerializer):
             'task_status',
             'task_user'
         ]
-        read_only_fields = ['id', 'task_user']
+        read_only_fields = [
+            'id', 
+            'task_user']
 
 
 class LogSerializer(serializers.ModelSerializer):
@@ -59,4 +62,7 @@ class LogSerializer(serializers.ModelSerializer):
             'change_time',
             'task_id'
         ]
-        read_only_fields = [ 'id', 'change_time', 'task_id' ]
+        read_only_fields = [ 
+            'id', 
+            'change_time', 
+            'task_id' ]
